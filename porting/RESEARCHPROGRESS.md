@@ -31,3 +31,7 @@
   scheduler, or data-structure logic without x86 hardware dependencies.
 - Recorded the architecture-neutral directory list and representative examples
   in `porting/ARCHNEUTRAL.md` to scope what can transfer unchanged to Arm64.
+
+## Entry 9
+- Compiled a status report for Sections 1 and 4 of the porting research plan in `porting/RESEARCHPASS01.md`, summarizing completed audits, remaining tasks, and follow-on investigations.
+- Reviewed existing research notes to identify outstanding questions on trap frame design, boot protocol translation, and Arm64 hardware targets for upcoming deep-dive work.
