@@ -1,0 +1,19 @@
+# Interrupt and Exception Handling Research Notes
+
+## Scope from the Research Plan
+- The porting plan calls out `kernel/core386.S` as the primary source for x86 interrupt and exception stubs and highlights the need to understand how they rely on `iret` and PIC-style flows before designing an Arm64 replacement.【F:porting/PORTINGRESEARCH.md†L7-L15】
+- The plan also stresses that we must replace the 8259 PIC and `int 0x80` syscall interface with Arm64-appropriate mechanisms such as the GIC and an `svc`-based ABI.【F:porting/PORTINGRESEARCH.md†L36-L41】
+
+## Observations from the Existing x86 Implementation
+- `kernel/core386.S` defines a trap frame layout that relies on `pusha`/`popa`, explicit pushes of all segment registers, and a fixed ordering for error-code and processor-saved state slots. Any Arm64 port must recreate an equivalent save area for general-purpose registers, SPSR, ELR, and potentially separate user/kernel stacks.【F:kernel/core386.S†L17-L84】
+- Exception stubs are auto-generated through macros that optionally synthesize error codes, call a shared `trap_handler`, and always end in `iret`. This tightly couples the flow to x86 gate semantics, so the Arm64 vector table will need per-syndrome entries that branch to a common handler while restoring state with `eret` instead.【F:kernel/core386.S†L89-L158】
+- IRQ stubs follow the same macro pattern—saving an artificial error slot, calling `irq_handler`, and re-enabling interrupts before returning with `iret`. Arm64 interrupt vectors will have to acknowledge the GIC and rework the bottom-half scheduling hooks to account for the different interrupt masking model.【F:kernel/core386.S†L161-L197】
+- The interrupt exit path re-enables interrupts (`sti`), runs bottom halves, checks for nested kernel interrupts by inspecting the saved CS selector, drives signal delivery, and hands off to the scheduler if `need_resched` is set. Arm64 exception return code must reproduce these sequencing requirements even though it will not have segment selectors or `sti/cli` instructions.【F:kernel/core386.S†L53-L112】
+- The PIC driver programs the legacy 8259 chips, remaps vectors to 0x20/0x28, and acknowledges interrupts via I/O port writes. For Arm64 we will instead need to drive a GIC or SoC-specific controller and adjust the ack/EOI flow expected by `irq_handler`.【F:kernel/pic.c†L15-L104】
+- Inline assembly helpers expose x86 primitives such as `cli`, `sti`, `int $0x80`, and CR register moves. These calls are sprinkled across the tree (for example, `USER_SYSCALL` uses `int 0x80`), so our Arm64 design has to supply replacements that map to `msr`/`mrs` operations and the `svc` instruction.【F:include/fiwix/asm.h†L94-L142】
+
+## Open Questions for the Arm64 Port
+- What exception level and vector layout should replace the x86 IDT so that synchronous exceptions, IRQs, FIQs, and SError map cleanly into the kernel’s trap and IRQ handlers? We need to chart how the shared handler logic (`trap_handler`, `irq_handler`, `do_bh`, `psig`, `do_sched`) will be invoked from Arm64 vectors.【F:kernel/core386.S†L43-L132】
+- How will we preserve the scheduler’s expectations about `need_resched` checks and signal delivery sequencing when the Arm64 return path will restore state with `eret` and may require separate ELR/SPSR bookkeeping?【F:kernel/core386.S†L53-L112】
+- Which GIC generation (GICv2 vs. GICv3) should we target initially, and what initialization/acknowledgment flow will substitute for the existing 8259 `ack_pic_irq` routine so that higher-level IRQ logic remains intact?【F:kernel/pic.c†L15-L104】【F:porting/PORTINGRESEARCH.md†L36-L38】
+- What syscall entry strategy (e.g., dedicated `svc` vector, `HVC` stubs) best aligns with the current `syscall` stub’s argument marshalling and bottom-half processing, and how will we map user register state into the Arm64 calling convention?【F:kernel/core386.S†L205-L240】【F:include/fiwix/asm.h†L125-L142】
