@@ -25,3 +25,9 @@
 ## Entry 7
 - Searched the tree for hard-coded paging, segment selector, and descriptor constants to gauge x86 assumptions that will block an Arm64 port.
 - Captured the key findings (selector values, GDT/IDT sizing, page flag bits, and PAGE_OFFSET/GDT_BASE layout coupling) in `porting/HARDCODED.md` for follow-up design work.
+
+## Entry 8
+- Surveyed the source tree to catalog subsystems that operate purely on VFS,
+  scheduler, or data-structure logic without x86 hardware dependencies.
+- Recorded the architecture-neutral directory list and representative examples
+  in `porting/ARCHNEUTRAL.md` to scope what can transfer unchanged to Arm64.
