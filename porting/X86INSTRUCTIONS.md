@@ -29,3 +29,10 @@ This document summarizes the existing x86-specific assumptions in `kernel/boot.S
 - `jmp cpu_idle` assumes `cpu_idle` is an x86 label reachable by direct jump.
 
 These architectural dependencies will need alternatives or emulation when designing the Arm64 boot sequence.
+
+## Inline Assembly Call Sites Identified with `rg`
+- `include/fiwix/asm.h` defines a set of helper macros that emit raw x86 instructions. These include interrupt flag control (`cli`, `sti`), idle/serialization primitives (`nop`, `hlt`), and privileged register moves to access `%cr2`/`%esp`. Porting to Arm64 will require equivalents for interrupt masking, low-power waits, and stack pointer management that respect the Arm64 privilege model.
+- The same header implements `SAVE_FLAGS`/`RESTORE_FLAGS` wrappers around `pushfl`/`popfl`, meaning our Arm64 plan must determine how to capture and restore PSTATE/DAIF bits without relying on stack-based flag instructions.
+- The `USER_SYSCALL` macro emits an `int $0x80` software interrupt. A portable Arm64 design needs to replace this with the appropriate `svc` invocation and calling convention, while also handling the TinyCC-specific register shuffling that the current macro accommodates.
+- `kernel/kexec.c` contains extensive inline assembly for the transition path when jumping into a replacement kernel. The sequences manipulate descriptor tables with `lidt`/`lgdt`, program control registers (`mov %cr0`, `mov %cr3`), reload segment registers, and perform a far `ljmp` through the stack. We must map each of these to Arm64's exception level transitions, MMU configuration, and branch mechanics when recreating the kexec trampoline.
+- Within the same file, temporary register setups move Multiboot magic values into `%eax`/`%ebx` prior to the jump. Arm64 support will need an alternative hand-off strategy for boot protocol registers (likely `x0`/`x1`) and a compatibility shim if Multiboot handoff must be preserved.
