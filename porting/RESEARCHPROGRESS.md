@@ -6,3 +6,6 @@
 
 ## Entry 2
 - Documented the existing linker script, memory map, and paging setup constraints in `porting/LINKERMEMORYPAGING.md` to inform Arm64 planning.
+
+## Entry 3
+- Catalogued x86 architectural data structures (GDT/IDT descriptors, TSS layout, trap frames, syscall ABI) and documented Arm64 replacement questions in `porting/STRUCTSANDABI.md`.
