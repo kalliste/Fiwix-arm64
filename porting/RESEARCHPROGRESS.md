@@ -21,3 +21,7 @@
 ## Entry 6
 - Used `rg` to inventory all inline `__asm__` blocks across the tree, capturing helper macros in `include/fiwix/asm.h` and the kexec trampoline logic in `kernel/kexec.c`.
 - Summarized the porting implications of these x86-specific instructions in `porting/X86INSTRUCTIONS.md` to inform the Arm64 design for interrupt masking, syscall invocation, control register manipulation, and hand-off mechanics.
+
+## Entry 7
+- Searched the tree for hard-coded paging, segment selector, and descriptor constants to gauge x86 assumptions that will block an Arm64 port.
+- Captured the key findings (selector values, GDT/IDT sizing, page flag bits, and PAGE_OFFSET/GDT_BASE layout coupling) in `porting/HARDCODED.md` for follow-up design work.
