@@ -17,3 +17,7 @@
 ## Entry 5
 - Traced legacy PC hardware controller dependencies (PIC, PIT, CMOS, PS/2, DMA, storage, console) to understand which subsystems rely on ISA-style I/O and chipset features.
 - Captured the findings in `porting/PCHARDWARE.md` to guide Arm64 replacements for timers, interrupt controllers, storage buses, and console I/O.
+
+## Entry 6
+- Used `rg` to inventory all inline `__asm__` blocks across the tree, capturing helper macros in `include/fiwix/asm.h` and the kexec trampoline logic in `kernel/kexec.c`.
+- Summarized the porting implications of these x86-specific instructions in `porting/X86INSTRUCTIONS.md` to inform the Arm64 design for interrupt masking, syscall invocation, control register manipulation, and hand-off mechanics.
