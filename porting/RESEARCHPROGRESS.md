@@ -9,3 +9,7 @@
 
 ## Entry 3
 - Catalogued x86 architectural data structures (GDT/IDT descriptors, TSS layout, trap frames, syscall ABI) and documented Arm64 replacement questions in `porting/STRUCTSANDABI.md`.
+
+## Entry 4
+- Studied `kernel/core386.S`, `kernel/pic.c`, and supporting headers to document how x86 interrupt/exception stubs, PIC flows, and syscall paths operate today.
+- Recorded findings and Arm64 follow-up questions in `porting/INTERUPTSEXCEPTIONS.md` for future planning.
