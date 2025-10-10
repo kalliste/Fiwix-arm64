@@ -13,3 +13,7 @@
 ## Entry 4
 - Studied `kernel/core386.S`, `kernel/pic.c`, and supporting headers to document how x86 interrupt/exception stubs, PIC flows, and syscall paths operate today.
 - Recorded findings and Arm64 follow-up questions in `porting/INTERUPTSEXCEPTIONS.md` for future planning.
+
+## Entry 5
+- Traced legacy PC hardware controller dependencies (PIC, PIT, CMOS, PS/2, DMA, storage, console) to understand which subsystems rely on ISA-style I/O and chipset features.
+- Captured the findings in `porting/PCHARDWARE.md` to guide Arm64 replacements for timers, interrupt controllers, storage buses, and console I/O.
