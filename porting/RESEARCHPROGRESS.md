@@ -35,3 +35,7 @@
 ## Entry 9
 - Compiled a status report for Sections 1 and 4 of the porting research plan in `porting/RESEARCHPASS01.md`, summarizing completed audits, remaining tasks, and follow-on investigations.
 - Reviewed existing research notes to identify outstanding questions on trap frame design, boot protocol translation, and Arm64 hardware targets for upcoming deep-dive work.
+
+## Entry 10
+- Investigated how the x86 trap frame is consumed after interrupt/exception entry, tracing `SAVE_ALL` through signal delivery, scheduler hooks, and `/proc` reporting.
+- Documented the findings and open Arm64 design questions in `porting/TRAPFRAME.md` to guide the eventual exception-frame redesign.
