@@ -39,3 +39,11 @@
 ## Entry 10
 - Investigated how the x86 trap frame is consumed after interrupt/exception entry, tracing `SAVE_ALL` through signal delivery, scheduler hooks, and `/proc` reporting.
 - Documented the findings and open Arm64 design questions in `porting/TRAPFRAME.md` to guide the eventual exception-frame redesign.
+
+## Entry 11
+- Mapped the full path from x86 trap and IRQ stubs through bottom-half dispatch,
+  signal delivery, and scheduler hooks, capturing the call graph and design
+  dependencies in `porting/IRQSIGNAL.md` for Arm64 exception-vector planning.【F:porting/IRQSIGNAL.md†L1-L84】
+- Reviewed timer, signal, and scheduler sources to confirm how `need_resched`
+  and `sigpending` are raised during interrupt handling so the Arm64 port can
+  preserve identical return-to-user semantics.【F:kernel/timer.c†L178-L336】【F:kernel/signal.c†L31-L226】【F:kernel/sched.c†L20-L82】
